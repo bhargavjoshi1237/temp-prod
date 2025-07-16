@@ -1,10 +1,9 @@
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import Modal from '@/Components/Modal';
 
-export default function BookEditModal({ show, onClose, book }) {
-    const { data, setData, put, processing, errors, delete: destroy } = useForm({
-        id: '',
+export default function BookAddModal({ show, onClose, processing, onAddBook }) {
+    const [form, setForm] = useState({
         title: '',
         author: '',
         price: '',
@@ -13,37 +12,38 @@ export default function BookEditModal({ show, onClose, book }) {
         isbn: '',
     });
 
-    useEffect(() => {
-        if (book) {
-            setData({
-                id: book.id || '',
-                title: book.title || '',
-                author: book.author || '',
-                price: book.price != null ? String(book.price) : '',
-                cover_image: book.cover_image || '',
-                description: book.description || '',
-                isbn: book.isbn || '',
-            });
-        }
-    }, [book, show]);
+    const { post, processing: formProcessing, errors, reset } = useForm();
 
-    const handleChange = (e) => {
-        setData(e.target.name, e.target.value);
+    const handleChange = e => {
+        setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = e => {
         e.preventDefault();
-        put(route('books.update', { id: data.id }), {
-            onSuccess: onClose,
-        });
-    };
-
-    const handleDelete = (e) => {
-        e.preventDefault();
-        if (data.id) {
-            if (window.confirm('Are you sure you want to delete this book?')) {
-                destroy(route('books.destroy', { id: data.id }), {
-                    onSuccess: onClose,
+        const trimmedForm = {
+            ...form,
+            title: form.title.trim(),
+            author: form.author.trim(),
+            price: form.price.trim(),
+        };
+        if (trimmedForm.title && trimmedForm.author && trimmedForm.price) {
+            if (onAddBook) {
+                onAddBook(trimmedForm);
+            } else {
+                post(route('books.store'), {
+                    ...trimmedForm,
+                    onSuccess: () => {
+                        onClose();
+                        reset();
+                        setForm({
+                            title: '',
+                            author: '',
+                            price: '',
+                            cover_image: '',
+                            description: '',
+                            isbn: '',
+                        });
+                    }
                 });
             }
         }
@@ -52,18 +52,20 @@ export default function BookEditModal({ show, onClose, book }) {
     return (
         <Modal show={show} onClose={onClose} maxWidth="md">
             <div className="p-6 bg-white rounded-lg shadow-xl">
-                <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
-                    <h2 className="text-xl font-semibold text-gray-900">Edit Book</h2>
-                    <button
-                        onClick={onClose}
-                        className="p-1 text-gray-400 hover:text-gray-500 rounded-md hover:bg-gray-50 transition-colors"
-                        aria-label="Close"
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
+  <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
+    <h2 className="text-xl font-semibold text-gray-900">Add New Book</h2>
+    <button
+      onClick={onClose}
+      className="p-1 text-gray-400 hover:text-gray-500 rounded-md hover:bg-gray-50 transition-colors"
+      aria-label="Close"
+    >
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+           
+                
                 
                 {Object.keys(errors).length > 0 && (
                     <div className="mb-6 p-3 bg-red-50 rounded-lg text-red-600 text-sm border border-red-100">
@@ -89,7 +91,7 @@ export default function BookEditModal({ show, onClose, book }) {
                                 id="title"
                                 type="text"
                                 name="title"
-                                value={data.title}
+                                value={form.title}
                                 onChange={handleChange}
                                 placeholder="Book title"
                                 required
@@ -105,7 +107,7 @@ export default function BookEditModal({ show, onClose, book }) {
                                 id="author"
                                 type="text"
                                 name="author"
-                                value={data.author}
+                                value={form.author}
                                 onChange={handleChange}
                                 placeholder="Author name"
                                 required
@@ -125,7 +127,7 @@ export default function BookEditModal({ show, onClose, book }) {
                                     id="price"
                                     type="number"
                                     name="price"
-                                    value={data.price}
+                                    value={form.price}
                                     onChange={handleChange}
                                     placeholder="0.00"
                                     step="0.01"
@@ -144,7 +146,7 @@ export default function BookEditModal({ show, onClose, book }) {
                                 id="isbn"
                                 type="text"
                                 name="isbn"
-                                value={data.isbn}
+                                value={form.isbn}
                                 onChange={handleChange}
                                 placeholder="ISBN number"
                                 className="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
@@ -160,7 +162,7 @@ export default function BookEditModal({ show, onClose, book }) {
                             id="cover_image"
                             type="url"
                             name="cover_image"
-                            value={data.cover_image}
+                            value={form.cover_image}
                             onChange={handleChange}
                             placeholder="https://example.com/image.jpg"
                             className="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
@@ -174,7 +176,7 @@ export default function BookEditModal({ show, onClose, book }) {
                         <textarea
                             id="description"
                             name="description"
-                            value={data.description}
+                            value={form.description}
                             onChange={handleChange}
                             placeholder="Book description"
                             rows={4}
@@ -182,51 +184,32 @@ export default function BookEditModal({ show, onClose, book }) {
                         />
                     </div>
 
-                    <div className="flex justify-between pt-4">
+                    <div className="flex justify-end space-x-3 pt-2">
                         <button
                             type="button"
-                            onClick={handleDelete}
-                            disabled={processing}
-                            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-1 focus:ring-red-500 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                            onClick={onClose}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         >
-                            {processing ? (
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={formProcessing}
+                            className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-md shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                        >
+                            {formProcessing ? (
                                 <span className="flex items-center justify-center">
                                     <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
-                                    Deleting...
+                                    Adding...
                                 </span>
-                            ) : 'Delete Book'}
+                            ) : 'Add Book'}
                         </button>
-
-                        <div className="flex space-x-3">
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={processing}
-                                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-                            >
-                                {processing ? (
-                                    <span className="flex items-center justify-center">
-                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Updating...
-                                    </span>
-                                ) : 'Update Book'}
-                            </button>
-                        </div>
                     </div>
                 </form>
             </div>
         </Modal>
     );
-}
+} 

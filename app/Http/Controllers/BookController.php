@@ -3,18 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Models\Book;
+use App\Http\Requests\BookRequest;
+use App\Http\Repositories\BookRepository;
 use App\Http\Controllers\BaseController;
 use Inertia\Inertia;
 
 class BookController extends BaseController
 {
-    protected $bookRepository;
-
-    public function __construct(\App\Http\Repositories\BookRepository $bookRepository)
-    {
-        $this->bookRepository = $bookRepository;
-    }
+    public function __construct(
+        public BookRepository $bookRepository,
+    ) {}
 
     public function index()
     {
@@ -28,49 +27,47 @@ class BookController extends BaseController
         ]);
     }
 
-    public function show($id)
+    public function show(Book $book)
     {
-        $book = $this->bookRepository->getById($id);
-        // You will add logic to fetch details from abc.nl here
-        if (!$book) {
-            return $this->sendRedirectBackError('Book not found.');
-        }
+
         $user = auth()->user();
         $role = $user ? $user->role : null;
+        $book->load(['reviews.user']);
         return Inertia::render('Book', [
             'book' => $book,
+            'reviews' => $book->reviews,
             'userRole' => $role,
             'user' => $user,
         ]);
     }
 
-    public function store(Request $request)
+    public function store(BookRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'cover_image' => 'nullable|string',
-            'description' => 'nullable|string',
-            'isbn' => 'nullable|string',
-            // add other required fields here if your DB/migration requires them
-        ]);
-        $this->bookRepository->create($validated);
-        return redirect()->route('dashboard');
+        try {
+            $this->bookRepository->create($request->validated());
+            return $this->sendRedirectResponse(route('dashboard'), 'Book created successfully.');
+        } catch (\Exception $e) {
+            return $this->sendRedirectBackError('Failed to create book.');
+        }
     }
 
-    public function update(Request $request, $id)
+    public function update(BookRequest $request, $id)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'cover_image' => 'nullable|string',
-            'description' => 'nullable|string',
-            'isbn' => 'nullable|string',
-            // add other required fields here if your DB/migration requires them
-        ]);
-        $this->bookRepository->update($id, $validated);
-        return redirect()->route('dashboard');
+        try {
+            $this->bookRepository->update($id, $request->validated());
+            return $this->sendRedirectResponse(route('dashboard'), 'Book updated successfully.');
+        } catch (\Exception $e) {
+            return $this->sendRedirectBackError('Failed to update book.');
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $this->bookRepository->destroy($id);
+            return $this->sendRedirectResponse(route('dashboard'), 'Book deleted successfully.');
+        } catch (\Exception $e) {
+            return $this->sendRedirectBackError('Failed to delete book.');
+        }
     }
 }

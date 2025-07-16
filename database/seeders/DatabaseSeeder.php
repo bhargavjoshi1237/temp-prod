@@ -15,11 +15,18 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        \App\Models\User::factory()->create([
+        User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
             'password' => bcrypt('12345678'), // Change as needed
             'role' => 'admin', // Make sure your User model has a 'role' column
+        ]);
+
+        User::factory()->create([
+            'name' => 'Bhargav Joshi',
+            'email' => 'bhargavjoshi1237@gmail.com',
+            'password' => bcrypt('12345678'), // Change as needed
+            'role' => 'user', // Make sure your User model has a 'role' column
         ]);
 
          Book::factory(25)->create();

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Repositories\DashboardRepository;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Book;
 
 class DashboardController extends Controller
 {

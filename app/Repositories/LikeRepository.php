@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Models\Like;
@@ -25,5 +26,5 @@ class LikeRepository
         return Like::where('user_id', $userId)->get();
     }
 
-    // Add more repository methods as needed
+ 
 }

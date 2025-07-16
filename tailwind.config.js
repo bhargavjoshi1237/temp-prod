@@ -12,6 +12,21 @@ export default {
 
     theme: {
         extend: {
+            colors: {
+                'vercel-gray': {
+                    100: '#fafafa',
+                    200: '#eaeaea',
+                    300: '#999999',
+                    400: '#888888',
+                    500: '#666666',
+                    600: '#444444',
+                    700: '#333333',
+                    800: '#222222',
+                    900: '#111111',
+                },
+                'vercel-blue': '#0070f3',
+                'vercel-pink': '#ff0080',
+            },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },

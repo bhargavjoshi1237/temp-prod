@@ -25,5 +25,4 @@ class BookRepository extends BaseRepository
         return parent::update($id, $data);
     }
 
-    // Add more repository methods as needed
 }

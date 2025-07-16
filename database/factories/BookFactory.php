@@ -11,11 +11,12 @@ class BookFactory extends Factory
     public function definition()
     {
         return [
-            'title' => $this->faker->sentence(3),
+            'title' => $title = $this->faker->words(2, true),
             'author' => $this->faker->name(),
-            'cover_image' => 'https://placehold.co/400x256?text=Book+Cover',
+            'cover_image' => 'https://placehold.co/600x400/EEE/31343C.png',
             'price' => $this->faker->randomFloat(2, 5, 100),
             'description' => $this->faker->paragraph(),
+            'isbn' => $this->faker->unique()->isbn13(),
         ];
     }
 }
