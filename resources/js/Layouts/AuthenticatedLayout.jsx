@@ -23,6 +23,11 @@ export default function AuthenticatedLayout({ header, children, likedBooks = [],
 
     useEffect(() => {
         setAdminBooks(window.booksForAdmin || []);
+        // Show liked books if coming from profile page
+        if (localStorage.getItem('showLikedBooks') === 'true') {
+            setShowLikedBooks(true);
+            localStorage.removeItem('showLikedBooks');
+        }
     }, []);
 
     const handleAddBook = (bookData) => {
@@ -142,7 +147,15 @@ export default function AuthenticatedLayout({ header, children, likedBooks = [],
                          
                         <Link   
                             href="#"
-                            onClick={e => { e.preventDefault(); setShowLikedBooks(true); }}
+                            onClick={e => {
+                                e.preventDefault();
+                                if (window.location.pathname === route('profile.edit')) {
+                                    localStorage.setItem('showLikedBooks', 'true');
+                                    window.location.href = route('dashboard');
+                                } else {
+                                    setShowLikedBooks(true);
+                                }
+                            }}
                             className={`px-3 py-2 rounded-md transition-colors font-medium text-sm flex items-center gap-2 ${collapsed ? 'justify-center' : ''} ${showLikedBooks ? 'bg-gray-200' : 'hover:bg-gray-100'}`}
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

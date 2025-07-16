@@ -66,10 +66,7 @@ export default function Dashboard({ books, likedBooks = [], handleEditBook }) {
                                     <div className="mb-3">
                                         <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 mb-1">{book.title}</h3>
                                         <p className="text-sm text-gray-600">{book.author}</p>
-                                        <div className="flex gap-2 mt-1">
-                                            <span className="text-xs text-gray-500">{book.likes_count ?? 0} Likes</span>
-                                            <span className="text-xs text-gray-500">{book.reviews_count ?? 0} Reviews</span>
-                                        </div>
+                                         
                                     </div>
                                     <div className="mt-auto pt-2 flex items-center justify-between">
                                         <span className="text-lg font-bold text-blue-600">€{book.price}</span>

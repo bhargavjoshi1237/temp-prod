@@ -8,29 +8,49 @@ export default function Edit({ mustVerifyEmail, status }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    Profile
+                <h2 className="text-xl font-semibold leading-tight text-gray-900">
+                    Profile Settings
                 </h2>
             }
         >
             <Head title="Profile" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
+            <div className="py-8">
+                <div className="mx-auto max-w-3xl space-y-8 px-4 sm:px-6 lg:px-8">
+                    {/* Profile Information Section */}
+                    <div className="bg-gray-200 p-6 shadow-sm rounded-xl border border-gray-100">
+                        <div className="mb-6">
+                            <h3 className="text-lg font-medium text-black">Profile Information</h3>
+                            <p className="mt-1 text-sm text-gray-500">
+                                Update your account's profile information and email address.
+                            </p>
+                        </div>
                         <UpdateProfileInformationForm
                             mustVerifyEmail={mustVerifyEmail}
                             status={status}
-                            className="max-w-xl"
                         />
                     </div>
 
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
-                        <UpdatePasswordForm className="max-w-xl" />
+                    {/* Password Update Section */}
+                    <div className="bg-gray-200 p-6 shadow-sm rounded-xl border border-gray-100">
+                        <div className="mb-6">
+                            <h3 className="text-lg font-medium text-gray-900">Update Password</h3>
+                            <p className="mt-1 text-sm text-gray-500">
+                                Ensure your account is using a long, random password to stay secure.
+                            </p>
+                        </div>
+                        <UpdatePasswordForm />
                     </div>
 
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
-                        <DeleteUserForm className="max-w-xl" />
+                    {/* Account Deletion Section */}
+                    <div className="bg-gray-200 p-6  shadow-sm rounded-xl border border-gray-100">
+                        <div className="mb-6">
+                            <h3 className="text-lg font-medium text-gray-900">Delete Account</h3>
+                            <p className="mt-1 text-sm text-gray-500">
+                                Once your account is deleted, all of its resources and data will be permanently removed.
+                            </p>
+                        </div>
+                        <DeleteUserForm />
                     </div>
                 </div>
             </div>
